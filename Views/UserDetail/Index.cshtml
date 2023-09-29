@@ -1,0 +1,103 @@
+﻿@model FetchGitUserDetailsMVCApp.Models.UserDetail
+@using FetchGitUserDetailsMVCApp.Models
+
+@{
+    ViewData["Title"] = "Search GitHub User";
+}
+
+<h3>Search GitHub User</h3>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-controller="UserDetail" asp-action="Search" method="post" class="form-inline">
+            <div class="input-group">
+                <input type="text" class="form-control" id="username" name="username" value="@ViewBag.Username" placeholder="Enter GitHub Username" required>
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@*We can create new view to show result. But to show in single page I am using same view*@
+@if (Model != null)
+{
+    <div class="mt-4"></div>
+
+    @if (Model.IsError)
+    {
+        <p class="text-danger">@Model.ErrorMessage</p>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card" style="width: 19rem;">
+                    <img src="@Model.AvatarUrl" class="card-img-top" alt="User Avatar">
+                    <div class="card-body">
+                        <h5 class="card-title">@Model.UserName</h5>
+                        <p class="card-text">@Model.Location</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.RepoDetails.First().Name)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.RepoDetails.First().Description)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.RepoDetails.First().StargazersCount)
+                            </th>
+                            <th>
+                                HTML URL
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.RepoDetails)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Description)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.StargazersCount)
+                                </td>
+                                <td>
+                                    <a href="@item.HtmlUrl" target="_blank">@item.HtmlUrl</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+}
+
+@*JavaScript code to store and restore the input value*@
+@section scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var usernameInput = document.getElementById("username");
+            usernameInput.addEventListener("input", function () {
+                sessionStorage.setItem("username", this.value);
+            });
+
+            var storedUsername = sessionStorage.getItem("username");
+            if (storedUsername) {
+                usernameInput.value = storedUsername;
+            }
+        });
+    </script>
+}
